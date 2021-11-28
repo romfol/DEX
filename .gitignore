@@ -1,0 +1,14 @@
+node_modules
+.env
+coverage
+coverage.json
+typechain
+build
+package-lock.json
+
+#Hardhat files
+cache
+artifacts
+
+#IDE files
+.idea
