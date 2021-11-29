@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "compile": "truffle compile",
     "migrate-rinkeby": "truffle migrate --network rinkeby --reset --compile-all -f 2 --to 2",
-    "verify-rinkeby": "truffle run verify TokenSale --network rinkeby",
+    "verify-rinkeby": "truffle run verify TokenSale Token --network rinkeby",
     "test": "npx hardhat test "
   },
   "author": "",
@@ -28,5 +29,8 @@
     "truffle-plugin-verify": "^0.5.18",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.4.0"
   }
 }
