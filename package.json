@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "migrate-rinkeby": "truffle migrate --network rinkeby --reset --compile-all -f 2 --to 2",
-    "verify-rinkeby": "truffle run verify Greeter --network rinkeby",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "verify-rinkeby": "truffle run verify TokenSale --network rinkeby",
+    "test": "npx hardhat test "
   },
   "author": "",
   "license": "ISC",

@@ -32,12 +32,12 @@ module.exports = {
   solidity: "0.8.10",
 
   networks: {
-    hardhat: {
-      forking: {
-        url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-        accounts: accountsTestnet
-      }
-    },
+    // hardhat: {
+    //   forking: {
+    //     url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+    //     accounts: accountsTestnet
+    //   }
+    // },
     mainnet: {
         url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
        // accounts: accountsMainnet,
