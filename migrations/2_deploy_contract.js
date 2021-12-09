@@ -1,7 +1,7 @@
 const TokenSale = artifacts.require("TokenSale");
-const Token = artifacts.require("Token");
+const Folton = artifacts.require("Folton");
 
 module.exports = function (deployer) {
    deployer.deploy(TokenSale);
-   // deployer.deploy(Token);
+   // deployer.deploy(Folton);
 };

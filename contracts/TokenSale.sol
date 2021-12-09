@@ -31,8 +31,14 @@ contract TokenSale {
         return studentsList.length;
     }
 
+    function getBalance() public view returns (uint256) {
+        address _tokenAddress = 0x95d1821FB00cd4C6647e74Db0373D0f17Aa4D998;
+        uint256 _balance = TokenInterface(_tokenAddress).balanceOf(address(_tokenAddress));
+        return _balance;
+    }
+
     function buyToken() public payable {
-        address _tokenAddress = 0x23DC68258197f646A8F8d6F4ded04CE9f08B73C7;
+        address _tokenAddress = 0x95d1821FB00cd4C6647e74Db0373D0f17Aa4D998;
         address _customer = msg.sender;
         uint256 _balance = TokenInterface(_tokenAddress).balanceOf(address(_tokenAddress));
 
@@ -41,13 +47,13 @@ contract TokenSale {
         uint256 _ethPrice = getEthPrice();
         uint256 _etherValue = msg.value;
         uint256 _decimals = AggregatorInterface(_aggregatorAddress).decimals();
-        uint256 _tokenPrice = (_ethPrice * _etherValue) / (10 ** _decimals * _studentsLength);
+        uint256 _tokensSend = (_ethPrice * _etherValue) / ((10 ** _decimals) * _studentsLength);
 
-        if (_balance < _tokenPrice) {
+        if (_balance < _tokensSend) {
             (bool sent, bytes memory data) = _customer.call{value: _etherValue}("Sorry, there is not enough tokens to buy");
             return;
         }
 
-        TokenInterface(_tokenAddress).transfer(_customer, _tokenPrice);
+        TokenInterface(_tokenAddress).transfer(_customer, _tokensSend);
     }
 }
