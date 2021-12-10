@@ -15,6 +15,7 @@ interface StudentsInterface {
 interface TokenInterface {
     function transfer(address recipient, uint256 amount) external returns (bool);
     function balanceOf(address _account) external view returns (uint256);
+    function mintToken(uint256 quantity) external payable;
 }
 
 contract TokenSale {
@@ -32,13 +33,18 @@ contract TokenSale {
     }
 
     function getBalance() public view returns (uint256) {
-        address _tokenAddress = 0x95d1821FB00cd4C6647e74Db0373D0f17Aa4D998;
+        address _tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
         uint256 _balance = TokenInterface(_tokenAddress).balanceOf(address(_tokenAddress));
         return _balance;
     }
 
+    function getToken(uint256 quantity) public payable {
+        address _tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
+        TokenInterface(_tokenAddress).mintToken(quantity);
+    }
+
     function buyToken() public payable {
-        address _tokenAddress = 0x95d1821FB00cd4C6647e74Db0373D0f17Aa4D998;
+        address _tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
         address _customer = msg.sender;
         uint256 _balance = TokenInterface(_tokenAddress).balanceOf(address(_tokenAddress));
 
