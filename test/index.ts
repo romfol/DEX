@@ -3,9 +3,9 @@ import { web3 } from "hardhat";
 const { ethers } = require("hardhat");
 const hre = require("hardhat");
 
-describe("TokenSale", function () {
+describe("DEX", function () {
   it("Should return the new greeting once it's changedw", async function () {
-    const TokenSale = await ethers.getContractFactory("TokenSale");
+    const TokenSale = await ethers.getContractFactory("DEX");
     const tokenSale = await TokenSale.deploy();
     await tokenSale.deployed();
 
