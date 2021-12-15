@@ -34,7 +34,7 @@ contract TokenSale {
 
     function getBalance() public view returns (uint256) {
         address _tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
-        uint256 _balance = TokenInterface(_tokenAddress).balanceOf(address(_tokenAddress));
+        uint256 _balance = TokenInterface(_tokenAddress).balanceOf(address(this));
         return _balance;
     }
 
