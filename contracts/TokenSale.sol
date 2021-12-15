@@ -43,22 +43,24 @@ contract TokenSale {
         TokenInterface(_tokenAddress).mintToken(quantity);
     }
 
-    function buyToken() public payable {
+    function buyByDAO() public payable {
+        
+    }
+
+    function buyByETH() public payable {
         address _tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
         address _customer = msg.sender;
-        uint256 _balance = TokenInterface(_tokenAddress).balanceOf(address(_tokenAddress));
 
         uint256 _studentsLength = getStudentsLength();
 
         uint256 _ethPrice = getEthPrice();
         uint256 _etherValue = msg.value;
+        require(_etherValue  > 0, "You need to send some Ether");
+
         uint256 _decimals = AggregatorInterface(_aggregatorAddress).decimals();
         uint256 _tokensSend = (_ethPrice * _etherValue) / ((10 ** _decimals) * _studentsLength);
 
-        if (_balance < _tokensSend) {
-            (bool sent, bytes memory data) = _customer.call{value: _etherValue}("Sorry, there is not enough tokens to buy");
-            return;
-        }
+        require(_tokensSend <= getBalance(), "Sorry, there is not enough tokens to buy");
 
         TokenInterface(_tokenAddress).transfer(_customer, _tokensSend);
     }

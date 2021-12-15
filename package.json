@@ -7,7 +7,7 @@
     "build": "truffle compile",
     "migrate-rinkeby": "truffle migrate --network rinkeby --reset --compile-all -f 2 --to 2",
     "verify-rinkeby": "truffle run verify Folton TokenSale --network rinkeby",
-    "test": "npx hardhat test "
+    "test": "npx hardhat test"
   },
   "author": "",
   "license": "ISC",
