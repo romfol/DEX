@@ -37,7 +37,7 @@ interface AggregatorInterface {
 
 contract DEX {
     constructor() {
-        getMoreTokens(1000000);
+        // getMoreTokens(1000000); 
     }
 
     address private customer = msg.sender;

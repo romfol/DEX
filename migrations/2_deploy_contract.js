@@ -3,5 +3,5 @@ const Folton = artifacts.require("Folton");
 
 module.exports = function (deployer) {
    deployer.deploy(DEX);
-   deployer.deploy(Folton);
+   // deployer.deploy(Folton);
 };

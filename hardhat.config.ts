@@ -22,29 +22,29 @@ const {
 
 const accountsTestnet = PRIVATE_KEY_TESTNET
   ? [PRIVATE_KEY_TESTNET]
-  : {mnemonic: MNEMONIC};
+  : { mnemonic: MNEMONIC };
 
 const accountsMainnet = PRIVATE_KEY
   ? [PRIVATE_KEY]
-  : {mnemonic: MNEMONIC};
+  : { mnemonic: MNEMONIC };
 
 module.exports = {
   solidity: "0.8.10",
 
   networks: {
-    // hardhat: {
-    //   forking: {
-    //     url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-    //     accounts: accountsTestnet
-    //   }
-    // },
-    mainnet: {
+    hardhat: {
+      forking: {
         url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-       // accounts: accountsMainnet,
+        accounts: accountsTestnet
+      }
+    },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+      // accounts: accountsMainnet,
     },
     rinkeby: {
-        url: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
-        accounts: accountsTestnet,
+      url: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
+      accounts: accountsTestnet,
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${INFURA_KEY}`,
