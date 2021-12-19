@@ -13,6 +13,8 @@ interface TokenInterface {
         view
         returns (uint256);
 
+    function approve(address spender, uint256 amount) external returns (bool);
+
     function mintToken(uint256 quantity) external payable;
 
     function transfer(address recipient, uint256 amount)
@@ -79,6 +81,10 @@ contract DEX {
         TokenInterface(tokenAddress).mintToken(quantity);
     }
 
+    function takePermission(uint256 _daiAmount) public payable {
+        TokenInterface(tokenDAIAddress).approve(customer, _daiAmount);
+    }
+
     function buyByDAI(uint256 _daiAmount) public payable {
         uint256 _daiPrice = getDAIPrice();
         require(_daiAmount > 0, "You need to send some DAI first");
@@ -97,7 +103,7 @@ contract DEX {
         );
         require(
             _allowance >= _daiAmount * 10**_decimals,
-            "You don't have allowance for this action"
+            "You don't have allowance for this action /n take permission first"
         );
 
         TokenInterface(tokenDAIAddress).transferFrom(

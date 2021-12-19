@@ -7,6 +7,7 @@ import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
 
 require("@nomiclabs/hardhat-web3");
+require("solidity-coverage");
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -14,6 +15,7 @@ require("@nomiclabs/hardhat-web3");
 
 const {
   INFURA_KEY,
+  ALCHEMY_KEY,
   MNEMONIC,
   ETHERSCAN_API_KEY,
   PRIVATE_KEY,
@@ -32,10 +34,16 @@ module.exports = {
   solidity: "0.8.10",
 
   networks: {
+    // hardhat: {
+    //   forking: {
+    //     url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+    //     accounts: accountsTestnet,
+    //   }
+    // },
     hardhat: {
       forking: {
-        url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
-        accounts: accountsTestnet
+        url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+        blockNumber: 9842600,
       }
     },
     mainnet: {
@@ -52,8 +60,6 @@ module.exports = {
     }
   },
   etherscan: {
-    // Your API key for Etherscan
-    // Obtain one at https://etherscan.io/
     apiKey: ETHERSCAN_API_KEY
   }
 };

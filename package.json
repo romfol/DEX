@@ -7,7 +7,8 @@
     "build": "truffle compile",
     "migrate-rinkeby": "truffle migrate --network rinkeby --reset --compile-all -f 2 --to 2",
     "verify-rinkeby": "truffle run verify DEX Folton --network rinkeby",
-    "test": "npx hardhat test"
+    "test": "npx hardhat test",
+    "test-coverage": "npx hardhat coverage"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,7 @@
     "pify": "^2.3.0",
     "prettier": "^2.4.1",
     "solhint": "^3.3.6",
+    "solidity-coverage": "^0.7.17",
     "truffle": "^5.4.21",
     "truffle-plugin-verify": "^0.5.18",
     "ts-node": "^10.4.0",
