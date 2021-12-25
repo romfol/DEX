@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 
 describe("Token contract", function () {
   let Token;
-  let hardhatToken: any;
+  let token: any;
   let tokenBalance: any;
   let tokenSupply: any;
   let owner: any;
@@ -12,14 +12,14 @@ describe("Token contract", function () {
   beforeEach(async function () {
     Token = await ethers.getContractFactory("Folton");
     [owner, ...addresses] = await ethers.getSigners();
-    hardhatToken = await Token.deploy();
-    tokenBalance = await hardhatToken.balanceOf(hardhatToken.address).value;
-    tokenSupply = hardhatToken.totalSupply().value;
+    token = await Token.deploy();
+    tokenBalance = await token.balanceOf(token.address).value;
+    tokenSupply = token.totalSupply().value;
   });
 
   describe("Deployment", function () {
     it("Should set the right owner", async function () {
-      expect(await hardhatToken.deployTransaction.from).to.equal(owner.address);
+      expect(await token.deployTransaction.from).to.equal(owner.address);
     });
 
     it("Deployment should assign the total supply of tokens to the token", async function () {
