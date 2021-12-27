@@ -45,7 +45,7 @@ contract DEX {
     address private customer = msg.sender;
     address private tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
     address private tokenDAIAddress =
-        0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa;
+        0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735;
     address private aggregatorETHAddress =
         0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
     address private aggregatorDAIAddress =
@@ -81,8 +81,16 @@ contract DEX {
         TokenInterface(tokenAddress).mintToken(quantity);
     }
 
-    function takePermission(uint256 _daiAmount) public payable {
-        TokenInterface(tokenDAIAddress).approve(customer, _daiAmount);
+    function getPermission(uint256 _daiAmount) public payable {
+        TokenInterface(tokenDAIAddress).approve(address(this), _daiAmount);
+    }
+
+    function checkAllowance() public view returns (uint256) {
+        uint256 _allowance = TokenInterface(tokenDAIAddress).allowance(
+            customer,
+            address(this)
+        );
+        return _allowance;
     }
 
     function buyByDAI(uint256 _daiAmount) public payable {
@@ -101,17 +109,20 @@ contract DEX {
             customer,
             address(this)
         );
-        require(
-            _allowance >= _daiAmount * 10**_decimals,
-            "You don't have allowance for this action /n take permission first"
-        );
+        // require(
+        //     _allowance >= _daiAmount * 10**_decimals,
+        //     "You don't have allowance for this action, get permission first"
+        // );
 
         TokenInterface(tokenDAIAddress).transferFrom(
             customer,
             address(this),
-            _daiAmount
+            _daiAmount * 10**_decimals
         );
-        TokenInterface(tokenAddress).transfer(customer, _tokensSend);
+        TokenInterface(tokenAddress).transfer(
+            customer,
+            _tokensSend * 10**_decimals
+        );
     }
 
     function buyByETH() public payable {
