@@ -32,8 +32,7 @@ interface TokenInterface {
     event Approval(
         address indexed owner,
         address indexed spender,
-        uint256 value,
-        bool result
+        uint256 value
     );
 }
 
@@ -101,15 +100,15 @@ contract DEX {
     function buyByDAI(uint256 _daiAmount) public {
         require(_daiAmount > 0, "You need to send some DAI first");
 
-        uint256 _daiPrice = getDAIPrice(); //8
+        uint256 _daiPrice = getDAIPrice();
         uint256 _decimalsAgg = AggregatorInterface(aggregatorDAIAddress)
             .decimals();
-        uint256 _tokensSend = (_daiPrice * _daiAmount) / (10**_decimalsAgg); //8
+        uint256 _tokensSend = (_daiPrice * _daiAmount) / (10**_decimalsAgg);
 
-        uint256 _decimalsDAI = TokenInterface(tokenDAIAddress).decimals(); //18
+        uint256 _decimalsDAI = TokenInterface(tokenDAIAddress).decimals();
 
         require(
-            _tokensSend <= getBalanceValue() / (10**_decimalsDAI), //18
+            _tokensSend <= getBalanceValue() / (10**_decimalsDAI),
             "Sorry, there is not enough tokens to buy"
         );
 

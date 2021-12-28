@@ -1,14 +1,15 @@
 
 import { assert, web3, artifacts } from "hardhat";
-const truffleAssert = require('truffle-assertions');
 const Token = artifacts.require("Folton");
 const DEX = artifacts.require("DEX");
+const TokenDAI = artifacts.require("DAItest");
 
 describe("DEX contract", function () {
   let accounts: string[];
   let primaryAcc: string;
   let secondaryAcc: string;
   let token: any;
+  let tokenDAI: any;
   let dex: any;
   let tokenBalance: String;
   let bn: any;
@@ -19,8 +20,8 @@ describe("DEX contract", function () {
     accounts = await web3.eth.getAccounts();
     primaryAcc = accounts[0];
     secondaryAcc = accounts[1];
-
     token = await Token.new();
+    tokenDAI = await TokenDAI.new(100);
     dex = await DEX.new();
     bn = web3.utils.toBN(1e18);
     tokensExpectMinted = 1000000;
@@ -50,17 +51,18 @@ describe("DEX contract", function () {
     });
 
     it("Should buy tokens by DAI", async () => {
-      const tokenBalanceDEXBefore = await dex.getBalanceValue();
-      const ETHBalanceBuyerBefore = web3.utils.toBN(await web3.eth.getBalance(primaryAcc));
-      const ETHBalanceBefore = bn.muln(1);
+      const tokenBalanceDEXBefore = await token.balanceOf(dex.address);
+      const tokenBalanceBuyerBefore = await token.balanceOf(primaryAcc);
+      const amountDAI = 100;
 
-      await dex.buyByETH({ from: primaryAcc, value: ETHBalanceBefore });
+      await tokenDAI.approve(dex.address, amountDAI, { from: primaryAcc });
+      await dex.buyByDAI(amountDAI, { from: primaryAcc });
 
       const tokenBalanceDEXAfter = await dex.getBalanceValue();
-      const ETHBalanceBuyerAfter = web3.utils.toBN(await web3.eth.getBalance(primaryAcc));
+      const tokenBalanceBuyerAfter = await token.balanceOf(primaryAcc);
 
       assert.equal(false, tokenBalanceDEXBefore.eq(tokenBalanceDEXAfter));
-      assert.equal(false, ETHBalanceBuyerBefore.eq(ETHBalanceBuyerAfter));
+      assert.equal(false, tokenBalanceBuyerBefore.eq(tokenBalanceBuyerAfter));
     });
   });
 });
