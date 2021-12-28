@@ -8,6 +8,8 @@ interface StudentsInterface {
 interface TokenInterface {
     function balanceOf(address _account) external view returns (uint256);
 
+    function decimals() external view returns (uint8);
+
     function allowance(address owner, address spender)
         external
         view
@@ -26,6 +28,13 @@ interface TokenInterface {
         address recipient,
         uint256 amount
     ) external returns (bool);
+
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value,
+        bool result
+    );
 }
 
 interface AggregatorInterface {
@@ -77,12 +86,8 @@ contract DEX {
         return _balance;
     }
 
-    function getMoreTokens(uint256 quantity) public payable {
+    function getMoreTokens(uint256 quantity) public {
         TokenInterface(tokenAddress).mintToken(quantity);
-    }
-
-    function getPermission(uint256 _daiAmount) public payable {
-        TokenInterface(tokenDAIAddress).approve(address(this), _daiAmount);
     }
 
     function checkAllowance() public view returns (uint256) {
@@ -93,35 +98,35 @@ contract DEX {
         return _allowance;
     }
 
-    function buyByDAI(uint256 _daiAmount) public payable {
-        uint256 _daiPrice = getDAIPrice();
+    function buyByDAI(uint256 _daiAmount) public {
         require(_daiAmount > 0, "You need to send some DAI first");
 
-        uint256 _decimals = AggregatorInterface(aggregatorDAIAddress)
+        uint256 _daiPrice = getDAIPrice(); //8
+        uint256 _decimalsAgg = AggregatorInterface(aggregatorDAIAddress)
             .decimals();
-        uint256 _tokensSend = (_daiPrice * _daiAmount) / (10**_decimals);
+        uint256 _tokensSend = (_daiPrice * _daiAmount) / (10**_decimalsAgg); //8
+
+        uint256 _decimalsDAI = TokenInterface(tokenDAIAddress).decimals(); //18
+
         require(
-            _tokensSend <= getBalanceValue() / (10**18),
+            _tokensSend <= getBalanceValue() / (10**_decimalsDAI), //18
             "Sorry, there is not enough tokens to buy"
         );
 
-        uint256 _allowance = TokenInterface(tokenDAIAddress).allowance(
-            customer,
-            address(this)
+        uint256 _allowance = checkAllowance();
+        require(
+            _allowance >= _daiAmount * 10**_decimalsDAI,
+            "You dont have allowance for this action, get permission first"
         );
-        // require(
-        //     _allowance >= _daiAmount * 10**_decimals,
-        //     "You don't have allowance for this action, get permission first"
-        // );
 
         TokenInterface(tokenDAIAddress).transferFrom(
             customer,
             address(this),
-            _daiAmount * 10**_decimals
+            _daiAmount * 10**_decimalsDAI
         );
         TokenInterface(tokenAddress).transfer(
             customer,
-            _tokensSend * 10**_decimals
+            _tokensSend * 10**_decimalsDAI
         );
     }
 
