@@ -1,5 +1,5 @@
-//SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.10;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.10;
 
 interface StudentsInterface {
     function getStudentsList() external view returns (string[] memory);
@@ -46,18 +46,19 @@ interface AggregatorInterface {
 }
 
 contract DEX {
-    constructor() {
-        getMoreTokens(1000000);
-    }
+    address public customer;
+    address public tokenAddress;
+    address public tokenDAIAddress;
+    address public studentsAddress;
+    address public aggregatorETHAddress;
+    address public aggregatorDAIAddress;
 
-    address private customer = msg.sender;
-    address private tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
-    address private tokenDAIAddress =
-        0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735;
-    address private aggregatorETHAddress =
-        0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
-    address private aggregatorDAIAddress =
-        0x2bA49Aaa16E6afD2a993473cfB70Fa8559B523cF;
+    function initialize(address _tokenAddress, address _tokenDAIAddress)
+        external
+    {
+        tokenAddress = _tokenAddress;
+        tokenDAIAddress = _tokenDAIAddress;
+    }
 
     function getETHPrice() public view returns (uint256) {
         (, int256 _price) = AggregatorInterface(aggregatorETHAddress)
@@ -72,8 +73,7 @@ contract DEX {
     }
 
     function getStudentsLength() public view returns (uint256) {
-        address _studentsAddress = 0x0E822C71e628b20a35F8bCAbe8c11F274246e64D;
-        string[] memory studentsList = StudentsInterface(_studentsAddress)
+        string[] memory studentsList = StudentsInterface(studentsAddress)
             .getStudentsList();
         return studentsList.length;
     }
