@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
+import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+
 interface StudentsInterface {
     function getStudentsList() external view returns (string[] memory);
 }
@@ -45,19 +47,46 @@ interface AggregatorInterface {
     function decimals() external view returns (uint8);
 }
 
-contract DEX {
-    address public customer;
-    address public tokenAddress;
-    address public tokenDAIAddress;
-    address public studentsAddress;
-    address public aggregatorETHAddress;
-    address public aggregatorDAIAddress;
+contract DEX is VRFConsumerBase {
+    constructor() VRFConsumerBase(vrfCoordinator, linkToken) {
+        getMoreTokens(1000000);
+    }
 
-    function initialize(address _tokenAddress, address _tokenDAIAddress)
-        external
+    // function initialize(address _tokenAddress, address _tokenDAIAddress)
+    //     external
+    // {
+    //     tokenAddress = _tokenAddress;
+    //     tokenDAIAddress = _tokenDAIAddress;
+    // }
+    address private linkToken = 0x01BE23585060835E02B77ef475b0Cc51aA1e0709;
+    address private vrfCoordinator = 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B;
+    bytes32 private keyHash =
+        0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
+    uint256 private fee = 0.1 * 10**18;
+    uint256 public randomResult;
+
+    address public customer = msg.sender;
+    address public tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
+    address public tokenDAIAddress = 0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735;
+    address public studentsAddress = 0x0E822C71e628b20a35F8bCAbe8c11F274246e64D;
+    address public aggregatorETHAddress =
+        0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
+    address public aggregatorDAIAddress =
+        0x2bA49Aaa16E6afD2a993473cfB70Fa8559B523cF;
+
+    function getRandomNumber() public returns (bytes32 requestId) {
+        require(
+            LINK.balanceOf(address(this)) >= fee,
+            "Not enough LINK - fill contract with faucet"
+        );
+        return requestRandomness(keyHash, fee);
+    }
+
+    function fulfillRandomness(bytes32 requestId, uint256 randomness)
+        internal
+        override
     {
-        tokenAddress = _tokenAddress;
-        tokenDAIAddress = _tokenDAIAddress;
+        randomResult = (randomness % 3) + 1;
     }
 
     function getETHPrice() public view returns (uint256) {
@@ -98,6 +127,7 @@ contract DEX {
     }
 
     function buyByDAI(uint256 _daiAmount) public {
+        require(randomResult != 0, "Wait please for indexation and try again");
         require(_daiAmount > 0, "You need to send some DAI first");
 
         uint256 _daiPrice = getDAIPrice();
@@ -125,11 +155,12 @@ contract DEX {
         );
         TokenInterface(tokenAddress).transfer(
             customer,
-            _tokensSend * 10**_decimalsDAI
+            _tokensSend * 10**_decimalsDAI * randomResult
         );
     }
 
     function buyByETH() public payable {
+        require(randomResult != 0, "Wait please for indexation and try again");
         uint256 _studentsLength = getStudentsLength();
 
         uint256 _ethPrice = getETHPrice();
@@ -146,6 +177,9 @@ contract DEX {
             "Sorry, there is not enough tokens to buy"
         );
 
-        TokenInterface(tokenAddress).transfer(customer, _tokensSend);
+        TokenInterface(tokenAddress).transfer(
+            customer,
+            _tokensSend * randomResult
+        );
     }
 }

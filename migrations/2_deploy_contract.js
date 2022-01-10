@@ -3,7 +3,7 @@ const DEX = artifacts.require("DEX");
 const Folton = artifacts.require("Folton");
 
 module.exports = function (deployer) {
-   deployer.deploy(Proxy);
+   // deployer.deploy(Proxy);
    deployer.deploy(DEX);
-   deployer.deploy(Folton);
+   // deployer.deploy(Folton);
 };
