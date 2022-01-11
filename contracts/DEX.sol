@@ -86,7 +86,14 @@ contract DEX is VRFConsumerBase {
         internal
         override
     {
-        randomResult = (randomness % 3) + 1;
+        randomResult = randomness;
+    }
+
+    function useMuptiplier(uint256 number) public view returns (uint256) {
+        uint8 offset = 5;
+        uint256 numberRange = (randomResult % 30) + offset;
+        if (numberRange > 30) numberRange = numberRange - offset;
+        return (number * numberRange) / 10;
     }
 
     function getETHPrice() public view returns (uint256) {
@@ -155,18 +162,18 @@ contract DEX is VRFConsumerBase {
         );
         TokenInterface(tokenAddress).transfer(
             customer,
-            _tokensSend * 10**_decimalsDAI * randomResult
+            useMuptiplier(_tokensSend * 10**_decimalsDAI)
         );
     }
 
     function buyByETH() public payable {
         require(randomResult != 0, "Wait please for indexation and try again");
-        uint256 _studentsLength = getStudentsLength();
 
         uint256 _ethPrice = getETHPrice();
         uint256 _ethValue = msg.value;
         require(_ethValue > 0, "You need to send some Ether");
 
+        uint256 _studentsLength = getStudentsLength();
         uint256 _decimals = AggregatorInterface(aggregatorETHAddress)
             .decimals();
         uint256 _tokensSend = (_ethPrice * _ethValue) /
@@ -179,7 +186,7 @@ contract DEX is VRFConsumerBase {
 
         TokenInterface(tokenAddress).transfer(
             customer,
-            _tokensSend * randomResult
+            useMuptiplier(_tokensSend)
         );
     }
 }
