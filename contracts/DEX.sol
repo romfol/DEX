@@ -2,6 +2,7 @@
 pragma solidity ^0.8.10;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 
 interface StudentsInterface {
     function getStudentsList() external view returns (string[] memory);
@@ -47,10 +48,13 @@ interface AggregatorInterface {
     function decimals() external view returns (uint8);
 }
 
-contract DEX is VRFConsumerBase {
+contract DEX is VRFConsumerBase, ChainlinkClient {
     constructor() VRFConsumerBase(vrfCoordinator, linkToken) {
+        setPublicChainlinkToken();
         getMoreTokens(1000000);
     }
+
+    using Chainlink for Chainlink.Request;
 
     // function initialize(address _tokenAddress, address _tokenDAIAddress)
     //     external
@@ -62,8 +66,13 @@ contract DEX is VRFConsumerBase {
     address private vrfCoordinator = 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B;
     bytes32 private keyHash =
         0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
-    uint256 private fee = 0.1 * 10**18;
     uint256 public randomResult;
+
+    address private oracle = 0xc57B33452b4F7BB189bB5AfaE9cc4aBa1f7a4FD8;
+    bytes32 private jobId = "6b88e0402e5d415eb946e528b8e0c7ba";
+    uint256 public volume;
+
+    uint256 private fee = 0.1 * 10**18;
 
     address public customer = msg.sender;
     address public tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
@@ -73,6 +82,30 @@ contract DEX is VRFConsumerBase {
         0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
     address public aggregatorDAIAddress =
         0x2bA49Aaa16E6afD2a993473cfB70Fa8559B523cF;
+
+    function requestVolumeData() public returns (bytes32 requestId) {
+        Chainlink.Request memory request = buildChainlinkRequest(
+            jobId,
+            address(this),
+            this.fulfill.selector
+        );
+        request.add(
+            "get",
+            "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD"
+        );
+        request.add("path", "RAW.ETH.USD.VOLUME24HOUR");
+        int256 timesAmount = 10**18;
+        request.addInt("times", timesAmount);
+
+        return sendChainlinkRequestTo(oracle, request, fee);
+    }
+
+    function fulfill(bytes32 _requestId, uint256 _volume)
+        public
+        recordChainlinkFulfillment(_requestId)
+    {
+        volume = _volume;
+    }
 
     function getRandomNumber() public returns (bytes32 requestId) {
         require(
