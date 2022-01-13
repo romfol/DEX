@@ -70,7 +70,7 @@ contract DEX is VRFConsumerBase, ChainlinkClient {
 
     address private oracle = 0xc57B33452b4F7BB189bB5AfaE9cc4aBa1f7a4FD8;
     bytes32 private jobId = "6b88e0402e5d415eb946e528b8e0c7ba";
-    uint256 public volume;
+    uint256 public ethPrice;
 
     uint256 private fee = 0.1 * 10**18;
 
@@ -104,7 +104,7 @@ contract DEX is VRFConsumerBase, ChainlinkClient {
         public
         recordChainlinkFulfillment(_requestId)
     {
-        volume = _volume;
+        ethPrice = _volume / 10**20;
     }
 
     function getRandomNumber() public returns (bytes32 requestId) {
@@ -124,16 +124,15 @@ contract DEX is VRFConsumerBase, ChainlinkClient {
 
     function useMuptiplier(uint256 number) public view returns (uint256) {
         uint8 offset = 5;
-        uint256 numberRange = (randomResult % 30) + offset;
-        if (numberRange > 30) numberRange = numberRange - offset;
+        uint256 numberRange = (randomResult % 25) + offset;
         return (number * numberRange) / 10;
     }
 
-    function getETHPrice() public view returns (uint256) {
-        (, int256 _price) = AggregatorInterface(aggregatorETHAddress)
-            .latestRoundData();
-        return uint256(_price);
-    }
+    // function getETHPrice() public view returns (uint256) {
+    //     (, int256 _price) = AggregatorInterface(aggregatorETHAddress)
+    //         .latestRoundData();
+    //     return uint256(_price);
+    // }
 
     function getDAIPrice() public view returns (uint256) {
         (, int256 _price) = AggregatorInterface(aggregatorDAIAddress)
@@ -167,7 +166,7 @@ contract DEX is VRFConsumerBase, ChainlinkClient {
     }
 
     function buyByDAI(uint256 _daiAmount) public {
-        require(randomResult != 0, "Wait please for indexation and try again");
+        require(randomResult != 0, "Wait please for getting random number");
         require(_daiAmount > 0, "You need to send some DAI first");
 
         uint256 _daiPrice = getDAIPrice();
@@ -200,17 +199,16 @@ contract DEX is VRFConsumerBase, ChainlinkClient {
     }
 
     function buyByETH() public payable {
-        require(randomResult != 0, "Wait please for indexation and try again");
-
-        uint256 _ethPrice = getETHPrice();
+        require(randomResult != 0, "Wait please for getting random number");
+        require(ethPrice != 0, "Wait please for getting eth price");
+        // uint256 _ethPrice = getETHPrice();
         uint256 _ethValue = msg.value;
         require(_ethValue > 0, "You need to send some Ether");
 
         uint256 _studentsLength = getStudentsLength();
-        uint256 _decimals = AggregatorInterface(aggregatorETHAddress)
-            .decimals();
-        uint256 _tokensSend = (_ethPrice * _ethValue) /
-            ((10**_decimals) * _studentsLength);
+        // uint256 _decimals = AggregatorInterface(aggregatorETHAddress)
+        //     .decimals();
+        uint256 _tokensSend = (ethPrice * _ethValue) / _studentsLength;
 
         require(
             _tokensSend <= getBalanceValue(),
