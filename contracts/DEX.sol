@@ -124,7 +124,7 @@ contract DEX is VRFConsumerBase, ChainlinkClient {
 
     function useMuptiplier(uint256 number) public view returns (uint256) {
         uint8 offset = 5;
-        uint256 numberRange = (randomResult % 25) + offset;
+        uint256 numberRange = (randomResult % 26) + offset;
         return (number * numberRange) / 10;
     }
 
