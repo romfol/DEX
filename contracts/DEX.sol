@@ -128,11 +128,11 @@ contract DEX is VRFConsumerBase, ChainlinkClient {
         return (number * numberRange) / 10;
     }
 
-    // function getETHPrice() public view returns (uint256) {
-    //     (, int256 _price) = AggregatorInterface(aggregatorETHAddress)
-    //         .latestRoundData();
-    //     return uint256(_price);
-    // }
+    function getETHPrice() public view returns (uint256) {
+        (, int256 _price) = AggregatorInterface(aggregatorETHAddress)
+            .latestRoundData();
+        return uint256(_price);
+    }
 
     function getDAIPrice() public view returns (uint256) {
         (, int256 _price) = AggregatorInterface(aggregatorDAIAddress)
