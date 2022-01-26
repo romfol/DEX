@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./RequestDataHelper.sol";
 import "./Interfaces.sol";
+import "./Utils.sol";
 
-contract DEX is RequestDataHelper {
+contract DEX is RequestDataHelper, Utils {
     constructor() {
         getMoreTokens(1000000);
     }
@@ -19,13 +21,21 @@ contract DEX is RequestDataHelper {
     address public customer = msg.sender;
     address public tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
     address public tokenDAIAddress = 0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735;
-    address public aggregatorETHAddress =
-        0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
+    // address public aggregatorETHAddress =
+    //     0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
 
-    AggregatorInterface private aggregator =
-        AggregatorInterface(0x2bA49Aaa16E6afD2a993473cfB70Fa8559B523cF);
+    AggregatorV3Interface private aggregator =
+        AggregatorV3Interface(0x2bA49Aaa16E6afD2a993473cfB70Fa8559B523cF);
     StudentsInterface private students =
         StudentsInterface(0x0E822C71e628b20a35F8bCAbe8c11F274246e64D);
+
+    receive() external payable {
+        buyByETH();
+    }
+
+    fallback() external payable {
+        buyByETH();
+    }
 
     // function getETHPrice() public view returns (uint256) {
     //     (, int256 _price) = AggregatorInterface(aggregatorETHAddress)
@@ -34,7 +44,7 @@ contract DEX is RequestDataHelper {
     // }
 
     function getDAIPrice() public view returns (uint256) {
-        (, int256 _price) = aggregator.latestRoundData();
+        (, int256 _price, , , ) = aggregator.latestRoundData();
         return uint256(_price);
     }
 
@@ -52,6 +62,13 @@ contract DEX is RequestDataHelper {
 
     function getMoreTokens(uint256 quantity) public {
         TokenInterface(tokenAddress).mintToken(quantity);
+    }
+
+    function withdrawAll() external onlyOwner {
+        uint256 ethBalance = address(this).balance;
+        if (ethBalance > 0) {
+            payable(owner).transfer(ethBalance);
+        }
     }
 
     function checkAllowance() public view returns (uint256) {
@@ -90,14 +107,18 @@ contract DEX is RequestDataHelper {
         );
         TokenInterface(tokenAddress).transfer(
             customer,
-            useMuptiplier(_tokensSend * 10**_decimalsDAI)
+            _useMuptiplier(_tokensSend * 10**_decimalsDAI)
         );
     }
 
     function buyByETH() public payable {
+        if (TokenInterface(linkToken).balanceOf(address(this)) < fee * 2) {
+            _refund(msg.sender, msg.value, "Not enough LINK token");
+        }
         require(randomResult != 0, "Wait please for getting random number");
         require(ethPrice != 0, "Wait please for getting eth price");
         // uint256 _ethPrice = getETHPrice();
+
         uint256 _ethValue = msg.value;
         require(_ethValue > 0, "You need to send some Ether");
 
@@ -113,7 +134,7 @@ contract DEX is RequestDataHelper {
 
         TokenInterface(tokenAddress).transfer(
             customer,
-            useMuptiplier(_tokensSend)
+            _useMuptiplier(_tokensSend)
         );
     }
 }

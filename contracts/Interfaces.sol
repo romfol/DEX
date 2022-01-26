@@ -35,12 +35,3 @@ interface TokenInterface {
         uint256 value
     );
 }
-
-interface AggregatorInterface {
-    function latestRoundData()
-        external
-        view
-        returns (uint80 roundId, int256 answer);
-
-    function decimals() external view returns (uint8);
-}

@@ -18,17 +18,11 @@ contract Ownable {
 }
 
 contract Proxy is Ownable {
-    address public tokenAddress;
-    address public tokenDAIAddress;
-    address public studentsAddress = 0x0E822C71e628b20a35F8bCAbe8c11F274246e64D;
-    address public aggregatorETHAddress =
-        0x8A753747A1Fa494EC906cE90E9f37563A8AF630e;
-    address public aggregatorDAIAddress =
-        0x2bA49Aaa16E6afD2a993473cfB70Fa8559B523cF;
-    address public customer = msg.sender;
+    address public tokenAddress = 0x84B60e52D2C40c00061781f8b055494cA3Ae43Ca;
+    address public tokenDAIAddress = 0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735;
 
     address payable public implementation =
-        payable(0x6CCa1b636056900575ec628AE632b0F4Ab5d147F);
+        payable(0x28EF96C39B4BE8474f4FCE679c60EF18862bf343);
     uint256 private version = 1;
 
     fallback() external payable {
